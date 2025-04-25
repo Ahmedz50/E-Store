@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>متجر المنتجات</title>
+
+  <!-- خط Noto Arabic -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
+
+  <style>
+  *{
+    font-family: 'Noto Kufi Arabic', sans-serif;
+  }
+    body {
+      direction: rtl;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background: #fff;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      font-size: 22px;
+      color: #333;
+      margin: 0;
+    }
+
+    .cart-icon {
+      position: relative;
+      font-size: 22px;
+      color: #e63946;
+      cursor: pointer;
+    }
+
+    .cart-icon .count {
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      background: #e63946;
+      color: #fff;
+      font-size: 12px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .controls {
+      text-align: center;
+      margin: 20px;
+    }
+
+    .controls input, .controls select {
+      padding: 8px;
+      margin: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    #product-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .product-card {
+      background-color: #fff;
+      width: 260px;
+      padding: 20px;
+      border-radius: 18px;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .product-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .product-card img {
+      width: 100%;
+      border-radius: 12px;
+    }
+
+    .product-card h2 {
+      margin: 15px 0 10px;
+      font-size: 20px;
+      color: #333;
+    }
+
+    .product-card .price {
+      font-size: 18px;
+      color: #e63946;
+      font-weight: bold;
+    }
+
+    .product-card a,
+    .product-card button {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 8px 14px;
+      background-color: #e63946;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .product-card a:hover,
+    .product-card button:hover {
+      background-color: #d62839;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1><i class="fa-solid fa-store icon"></i> متجر المنتجات</h1>
+    <div class="cart-icon" onclick="location.href='checkout.html'">
+      <i class="fa-solid fa-cart-shopping"></i>
+      <span class="count" id="cart-count">0</span>
+    </div>
+  </header>
+
+  <div class="controls">
+    <input type="text" id="searchInput" placeholder="ابحث عن منتج...">
+    <select id="filterSelect">
+      <option value="all">كل التصنيفات</option>
+      <option value="إلكترونيات">إلكترونيات</option>
+      <option value="ملابس">ملابس</option>
+      <option value="إكسسوارات">إكسسوارات</option>
+    </select>
+  </div>
+
+  <div id="product-list"></div>
+
+  <script>
+    let productsData = [];
+
+    function updateCartCount() {
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      document.getElementById('cart-count').textContent = cart.length;
+    }
+
+    function renderProducts() {
+      const searchValue = document.getElementById('searchInput').value.toLowerCase();
+      const filterValue = document.getElementById('filterSelect').value;
+
+      const filtered = productsData.filter(p => {
+        const matchesSearch = p.name.toLowerCase().includes(searchValue);
+        const matchesFilter = filterValue === 'all' || p.category === filterValue;
+        return matchesSearch && matchesFilter;
+      });
+
+      const container = document.getElementById('product-list');
+      container.innerHTML = '';
+
+      filtered.forEach(product => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+
+        card.innerHTML = `
+          <img src="${product.image}" alt="${product.name}">
+          <h2>${product.name}</h2>
+          <p class="price">${product.price} ريال</p>
+          <a href="product.html?id=${product.id}">عرض التفاصيل</a>
+          <button onclick="addToCart('${product.id}')"><i class="fa-solid fa-cart-plus"></i> أضف للسلة</button>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    function addToCart(id) {
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      cart.push(id);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCartCount();
+      alert("تمت إضافة المنتج إلى السلة");
+    }
+
+    document.getElementById('searchInput').addEventListener('input', renderProducts);
+    document.getElementById('filterSelect').addEventListener('change', renderProducts);
+
+    fetch('products.json')
+      .then(res => res.json())
+      .then(products => {
+        productsData = products;
+        updateCartCount();
+        renderProducts();
+      });
+  </script>
+<script src="//code.tidio.co/bt6o73leaxnquyapfyciquuvmamennro.js" async></script>
+</body>
+</html>

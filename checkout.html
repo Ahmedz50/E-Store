@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>سلة المشتريات</title>
+
+  <!-- خط Noto Arabic -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
+
+  <style>
+    body {
+      font-family: 'Noto Kufi Arabic', sans-serif;
+      direction: rtl;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 20px;
+    }
+
+    header {
+      background: #fff;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      font-size: 22px;
+      color: #333;
+      margin: 0;
+    }
+
+    .cart-icon {
+      position: relative;
+      font-size: 22px;
+      color: #e63946;
+      cursor: pointer;
+    }
+
+    .cart-icon .count {
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      background: #e63946;
+      color: #fff;
+      font-size: 12px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    h2 {
+      text-align: center;
+      margin: 20px 0;
+      color: #333;
+    }
+
+    #cart-items {
+      max-width: 800px;
+      margin: auto;
+    }
+
+    .item {
+      background: #fff;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .item img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-left: 15px;
+    }
+
+    .item-details {
+      flex-grow: 1;
+      text-align: right;
+    }
+
+    .item-details h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .item-details p {
+      margin: 5px 0;
+      color: #e63946;
+      font-weight: bold;
+    }
+
+    .remove-btn {
+      background: #e63946;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+
+    .total {
+      text-align: center;
+      font-size: 20px;
+      margin: 20px 0;
+      color: #333;
+    }
+
+    .checkout-btn {
+      display: block;
+      margin: 0 auto;
+      padding: 12px 30px;
+      background-color: #e63946;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .checkout-btn:hover {
+      background-color: #d62839;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1><i class="fa-solid fa-cart-shopping icon"></i> سلة المشتريات</h1>
+    <div class="cart-icon" onclick="location.href='checkout.html'">
+      <i class="fa-solid fa-cart-shopping"></i>
+      <span class="count" id="cart-count">0</span>
+    </div>
+  </header>
+
+  <h2>المنتجات المضافة</h2>
+  <div id="cart-items"></div>
+  <div class="total" id="total-price">الإجمالي: 0 ريال</div>
+  <button class="checkout-btn" onclick="completeOrder()">إتمام الطلب</button>
+
+  <script>
+    let productsData = [];
+
+    function updateCartCount() {
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      document.getElementById('cart-count').textContent = cart.length;
+    }
+
+    function renderCart() {
+      const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      const container = document.getElementById('cart-items');
+      container.innerHTML = '';
+      let total = 0;
+
+      if (cart.length === 0) {
+        container.innerHTML = '<p style="text-align:center">السلة فارغة</p>';
+        document.getElementById('total-price').textContent = 'الإجمالي: 0 ريال';
+        return;
+      }
+
+      cart.forEach(id => {
+        const product = productsData.find(p => p.id === id);
+        if (product) {
+          total += parseFloat(product.price);
+
+          const item = document.createElement('div');
+          item.className = 'item';
+
+          item.innerHTML = `
+            <img src="${product.image}" alt="${product.name}">
+            <div class="item-details">
+              <h3>${product.name}</h3>
+              <p>${product.price} ريال</p>
+            </div>
+            <button class="remove-btn" onclick="removeItem('${id}')">حذف</button>
+          `;
+
+          container.appendChild(item);
+        }
+      });
+
+      document.getElementById('total-price').textContent = 'الإجمالي: ' + total + ' ريال';
+    }
+
+    function removeItem(id) {
+      let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+      const index = cart.indexOf(id);
+      if (index > -1) {
+        cart.splice(index, 1);
+        localStorage.setItem('cart', JSON.stringify(cart));
+        updateCartCount();
+        renderCart();
+      }
+    }
+
+  function completeOrder() {
+    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+    if (cart.length === 0) {
+      alert("السلة فارغة!");
+      return;
+    }
+
+    let message = "*طلب جديد من المتجر:*\n";
+    let total = 0;
+
+    cart.forEach(id => {
+      const product = productsData.find(p => p.id === id);
+      if (product) {
+        message += `• ${product.name} - ${product.price} ريال\n`;
+        total += parseFloat(product.price);
+      }
+    });
+
+    message += `\n*الإجمالي:* ${total} ريال`;
+
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappURL = `https://wa.me/249906797578?text=${encodedMessage}`;
+
+    // فتح الرابط
+    window.open(whatsappURL, '_blank');
+
+    // تفريغ السلة
+    localStorage.removeItem('cart');
+    updateCartCount();
+    renderCart();
+  }
+
+    fetch('products.json')
+      .then(res => res.json())
+      .then(products => {
+        productsData = products;
+        updateCartCount();
+        renderCart();
+      });
+  </script>
+
+</body>
+</html>

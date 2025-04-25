@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>تفاصيل المنتج</title>
+
+  <!-- خط Noto Arabic -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <style>
+  *{
+    font-family: 'Noto Kufi Arabic', sans-serif;
+  }
+    body {
+      direction: rtl;
+      text-align: center;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .product-card {
+      background-color: #fff;
+      max-width: 420px;
+      margin: 50px auto;
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      animation: fadeIn 0.7s ease-in-out;
+    }
+
+    .product-card img {
+      width: 100%;
+      border-radius: 15px;
+    }
+
+    .product-card h1 {
+      margin: 20px 0 10px;
+      font-size: 26px;
+      color: #333;
+    }
+
+    .product-card p {
+      font-size: 17px;
+      color: #555;
+      margin: 10px 0;
+    }
+
+    .price {
+      font-size: 20px;
+      color: #e63946;
+      font-weight: bold;
+    }
+
+    .product-card button {
+      margin-top: 20px;
+      padding: 12px 30px;
+      background-color: #e63946;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .product-card button:hover {
+      background-color: #d62839;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .icon {
+      font-size: 20px;
+      color: #e63946;
+      margin-left: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="product-details">
+    <p>جارٍ تحميل التفاصيل...</p>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id');
+
+    fetch('products.json')
+      .then(res => res.json())
+      .then(products => {
+        const product = products.find(p => p.id === productId);
+        const container = document.getElementById('product-details');
+
+        if (!product) {
+          container.innerHTML = '<p>المنتج غير موجود</p>';
+          return;
+        }
+
+        container.innerHTML = `
+          <div class="product-card">
+            <img src="${product.image}" alt="${product.name}">
+            <h1><i class="fa-solid fa-box icon"></i> ${product.name}</h1>
+            <p>${product.description}</p>
+            <p class="price"><i class="fa-solid fa-tag icon"></i> ${product.price} ريال</p>
+            <button onclick="alert('تمت إضافة المنتج إلى السلة')">
+              <i class="fa-solid fa-cart-plus"></i> أضف إلى السلة
+            </button>
+          </div>
+        `;
+      });
+  </script>
+
+</body>
+</html>

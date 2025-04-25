@@ -1,0 +1,16 @@
+[
+  {
+    "id": "1",
+    "name": "ساعة ذكية",
+    "price": 350,
+    "description": "ساعة متعددة الوظائف بتصميم أنيق",
+    "image": "https://pyxis.nymag.com/v1/imgs/18c/714/5ef8445a19acd7192897e42790d828b55f.rsquare.w600.jpg"
+  },
+  {
+    "id": "2",
+    "name": "سماعات بلوتوث",
+    "price": 180,
+    "description": "سماعات عالية الجودة بميزة العزل",
+    "image": "https://craftbymerlin.com/cdn/shop/files/img-1_df721c38-9073-4811-a8b1-336a50be8b9b.jpg?v=1734609719"
+  }
+]
